@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script lang="javascript" src="js/jquery-3.1.0.min.js"></script>
+	<script lang="javascript" src="js/d3.min.js"></script>
+</head>
+<body>
+	
+	<script>
+
+		/*
+		 * Name: Nicholas Yan
+		 * Word: Wander
+		 */
+
+		var dimension = 500;
+
+		var svg = d3.select('body').append('svg')
+			.attr('width', dimension)
+			.attr('height', dimension)
+			.style('background-color', 'white');
+
+		/*//////////////////////////////////////////////////////////////////////
+		//						                                              //
+		//							 CONFIGURATION							  //
+		//																	  // 
+		//////////////////////////////////////////////////////////////////////*/
+
+		var actor_size   = (dimension / 100) + 1;
+		var actor_space  = Math.pow(actor_size * 10, 2);
+
+		var move_size	 = 1;
+		var move_time    = 100;
+
+		// number of turns actors remain in conversation for
+		var freeze_turns = 50;
+
+		var actor_color  = "rgba(255, 205, 148, 0.8)";
+		var chat_color   = "rgba(51, 122, 183, 0.3)";
+
+		/*//////////////////////////////////////////////////////////////////////
+		//						                                              //
+		//	           	               FUNCTIONS							  //
+		//																	  // 
+		//////////////////////////////////////////////////////////////////////*/
+
+		function simulate() {
+
+			var actors = populate();
+			simulateTurns(actors, -1);
+
+		}
+
+		simulate();
+
+		function populate() {
+
+			var actors = [];
+
+			var total_area = Math.pow(dimension, 2);
+			var num_actors = total_area / (actor_space * 3) + 2;		
+			// there should be a minimum of 2 actors (hence + 2)
+
+			for (var i = 0; i < num_actors; i++) {
+				actors.push(createActor(Math.random() * dimension, 
+					                    Math.random() * dimension));
+			}
+
+			return actors;
+
+		}
+
+		function createActor(start_x, start_y) {
+
+			return svg.append("circle")
+			          .attr("cx", start_x)
+			   		  .attr("cy", start_y)
+			   		  .attr("r", actor_size)
+			   		  .attr("fill", actor_color)
+			   		  .attr("stroke", "black")
+			   		  .attr("stroke-width", 0.1)
+			   		  .attr("freeze", 0)
+			   		  .attr("vel_x", 0)
+			   		  .attr("vel_y", 0);
+
+		}
+
+		// simulate num_steps turns; if num_steps is -1, keep running the 
+		// simulation indefinitely
+		function simulateTurns(actors, num_steps) {
+
+			var num_actors = actors.length;
+			for (var i = 0; i < num_actors; i++) {
+				socializeNeighbors(actors[i], actors);
+				moveRandDirection(actors[i], i * (move_time / num_actors));
+			}
+
+			setTimeout(function() {
+				if (num_steps == 0)
+					return;
+				else if (num_steps > 0)
+					return simulateTurns(actors, num_steps - 1);
+				else
+					simulateTurns(actors, -1);
+			}, move_time);
+
+		}
+
+		// randomly update a user's velocity, given either their x ("cx") or
+		// y ("cy") velocity
+		function updateVelocity(actor, velocity) {
+
+			var old_vel = parseFloat(actor.attr(velocity));
+
+			// add the random change to their old velocity, creating a sense
+			// of smooth momentum and avoiding jerky, sudden reversals of
+			// direction
+			var new_vel = Math.min((randAdjustment() + old_vel), 2);
+			
+			actor.attr(velocity, new_vel);
+			return new_vel;
+
+		}
+
+		function randAdjustment() {
+			return Math.random() * 0.5 - 0.25;
+		}
+
+		function moveRandDirection(actor, delay) {
+
+			// if the actor is currently frozen/engaged in conversation,
+			// don't update their position
+			var freeze_num = parseFloat(actor.attr("freeze"));
+			if (freeze_num != 0) {
+				actor.attr("freeze", freeze_num - 1);
+				if (freeze_num > (freeze_turns / 2))
+					return;
+			}
+
+			var curr_x = parseFloat(actor.attr("cx"));
+			var curr_y = parseFloat(actor.attr("cy"));
+			
+			var new_x_vel = updateVelocity(actor, "vel_x");
+			var new_y_vel = updateVelocity(actor, "vel_y");
+
+			var curr_fill = actor.attr("fill");
+
+			var new_cx = curr_x + new_x_vel;
+			var new_cy = curr_y + new_y_vel;
+
+			actor.transition()
+			     .ease(d3.easeLinear)
+			     .attr("cx", new_cx)
+			     .attr("cy", new_cy)
+			     .duration(move_time);
+
+			// if the actor is going out of bounds of the SVG, turn them
+			// around
+
+			if (!inBounds(new_cx))
+				reverseVelocity(actor, "vel_x");
+		
+			if (!inBounds(new_cy))
+				reverseVelocity(actor, "vel_y");
+
+		}
+
+		function inBounds(pt) {
+			var buffer = dimension / 10;
+			return 0 - buffer <= pt && dimension + buffer >= pt;
+		}
+
+		function reverseVelocity(actor, velocity) {
+			actor.attr(velocity, -1 * actor.attr(velocity));
+		}
+
+		// if two actors are close enough to each other, allow them to
+		// socialize, engaging in conversation
+		function socializeNeighbors(actor, friends) {
+
+			// actor.attr('fill', 'black');
+			var num_friends = friends.length;
+
+			for (var i = 0; i < num_friends; i++) {
+
+				if (actor != friends[i] &&
+					dist(actor, friends[i]) < actor_size * 3) {
+					socialize(actor, friends[i]);
+				}
+			}
+
+		}
+
+		function dist(a1, a2) {
+
+			var a1_cx = parseFloat(a1.attr("cx"));
+			var a1_cy = parseFloat(a1.attr("cy"));
+			var a2_cx = parseFloat(a2.attr("cx"));
+			var a2_cy = parseFloat(a2.attr("cy"));
+
+			return Math.sqrt(Math.pow(a1_cx - a2_cx, 2) + 
+				             Math.pow(a1_cy - a2_cy, 2));
+
+		}
+
+		// given an actor and a friend, if they are not already socializing
+		// show a speech bubble between them and darken their color
+		function socialize(actor, friend) {
+
+			// if already socializing, don't do anything
+			var freeze_num = parseFloat(actor.attr("freeze"));
+			if (freeze_num != 0)
+				return;
+
+			actor.attr("freeze", freeze_turns);
+			friend.attr("freeze", freeze_turns);
+
+			initializeChat(actor, friend);
+
+		}
+
+		function initializeChat(actor, friend) {
+
+			var avg_cx = 0.5 * (parseFloat(actor.attr("cx")) + 
+				                parseFloat(friend.attr("cx")));
+			var avg_cy = 0.5 * (parseFloat(actor.attr("cy")) + 
+				                parseFloat(friend.attr("cy")));
+
+			displayChatBubble(avg_cx, avg_cy);
+
+		}
+
+		function displayChatBubble(start_x, start_y) {
+
+			var chatBubble = svg.append("g");
+
+			// triangle of chat box
+			var tri = chatBubble.append("polygon")
+					        	.attr("points", function() {
+
+					  				var top_left_x  = start_x;
+					   				var top_left_y  = start_y - actor_size;
+
+					   				var top_right_x = start_x + (actor_size * 2);
+					   				var top_right_y = start_y - actor_size;
+
+					   				var bottom_x    = start_x;
+						   			var bottom_y    = start_y;
+
+								   	return [top_left_x + "," + top_left_y + " " +
+								   		    top_right_x + "," + top_right_y + " " +
+								   		    bottom_x + "," + bottom_y];
+							   })
+						 	   .attr("fill", chat_color);
+
+			// rectangle of chat box
+			var rect = chatBubble.append("rect")
+			             	     .attr("x", start_x - actor_size)
+			              		 .attr("y", start_y - actor_size * 4)
+			              		 .attr("height", actor_size * 3)
+			              		 .attr("width", actor_size * 7)
+			              		 .attr("fill", chat_color);
+
+
+			chatBubble.attr("opacity", 1)
+			          .transition()
+			          .delay(move_time * (freeze_turns / 2))
+			          .attr("opacity", 0)
+			          .duration(move_time);
+
+			chatBubble.transition()
+			          .delay(move_time * freeze_turns)
+			          .remove();
+
+		}
+
+	</script>
+</body>
+</html>

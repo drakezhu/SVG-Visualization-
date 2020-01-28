@@ -14,11 +14,13 @@
 	
 	<script>
 		var dimension = 500;
-
-		var svg = d3.select('body').append('svg')
-			.attr('width', dimension)
-			.attr('height', dimension)
-			.style('background-color', 'black');
+        var x_dimension = dimension;
+        var y_dimension = dimension;
+        
+		// var svg = d3.select('body').append('svg')
+		// 	.attr('width', dimension)
+		// 	.attr('height', dimension)
+		// 	.style('background-color', 'black');
 
 		// YOUR CODE SHOULD START HERE
 		/*
@@ -26,14 +28,78 @@
 		 * Word: THE WORD YOU CHOSE
 		 */
 
-		svg.style('background-color', 'red');
+
+		// svg.append("circle")
+		// 	.attr("id", "hi")
+		// 	.attr("cx", 0)
+		// 	.attr("cy", 0)
+		// 	.attr("r", 50)
+		// 	.attr("fill", "#ffffcc");
+
+		var mousecoord = [0, 0];
+
+		var svg = d3.select('body').append('svg')
+			.attr('width', dimension)
+			.attr('height', dimension)
+            .on("mousemove", function () {
+                mousecoord = d3.mouse(this);                
+                d3.select("#light").attr("cx", mousecoord[0])
+                                   .attr("cy", mousecoord[1]);
+                var x_offset = (mousecoord[0] - dimension/2) / (dimension / 10);
+                var y_offset = (mousecoord[1] - dimension/2) / (dimension / 10);
+                // d3.select("#eye").attr("transform", "translate(" + x_offset + ", " + y_offset +")");
+                // d3.select("#eye").attr("clip-path", "url(#eye_clip)");
+            })
+			.style('background-color', 'black');             
 
 		svg.append("circle")
-			.attr("id", "hi")
-			.attr("cx", dimension/3)
-			.attr("cy", dimension/3)
-			.attr("r", 30)
-			.attr("fill", "#ffffcc");
+            .attr("id", "light")
+            .attr("pointer-events", "none")
+            .attr("r", 30)
+            .attr("fill", "green")
+            .attr("opacity", 0.5);
+
+        var dataset = [];
+        for (var i = 0; i < 500; i++ ) {
+            var new_x = Math.random() * x_dimension;
+            var new_y = Math.random() * y_dimension;
+            dataset.push([new_x, new_y]);
+        }
+
+        var circles = svg.selectAll("circle")
+            .data(dataset)
+            .enter()
+            .append("circle")
+            .style('fill', "255,198,0");
+        
+        circles.attr("cx", function(d) { return d[0]; })
+           .attr("cy", function(d) { return d[1]; })
+           .attr("r", 5)
+           .attr("fill","orange");
+
+        circles.each(function(){
+            var cur_thing = d3.select(this);
+            var cur_x = cur_thing.attr("cx");
+            // var move_x = (x_dimension/2) - cur_x;
+            var cur_y = cur_thing.attr("cy");
+            // var move_y = (y_dimension/2) - cur_y;
+            // cur_thing.transition()
+            //     .duration(Math.random() * 30000)
+            //     .attr("transform", "translate(" + move_x +"," + move_y +")");
+        });
+		// svg.
+		// var text = svg.append("text")
+		// 	.text("Click me!")
+		// 	.attr("x", dimension / 2)
+		// 	.attr("y", dimension / 2)
+		// 	.style("text-anchor", "middle");		
+		// svg.on("click", function() {
+		// 	svg.select("text").remove();
+		// 	x_pos = event.pageX;
+		// 	y_pos = event.pageY;
+			
+		// });
+
 
 		console.log(d3.select("#hi").attr("r"));
 

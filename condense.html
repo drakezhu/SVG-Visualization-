@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script lang="javascript" src="js/jquery-3.1.0.min.js"></script>
+	<script lang="javascript" src="js/d3.min.js"></script>
+</head>
+<body>
+
+	<script>
+		/*
+		 * Name: Walton Lee
+		 * Word: Accumulate
+		 */
+
+		var dim = 500;
+		var size = 100;
+		var smallr = 10;
+
+		var svg = d3.select('body').append('svg')
+			.attr('width', dim)
+			.attr('height', dim)
+			.style('background-color', 'black');
+
+		mySVG = d3.select('svg');
+
+		var radialGradient = svg.append("defs")
+		  .append("linearGradient")
+	    .attr("id", "radial-gradient");
+
+		radialGradient.append("stop")
+		    .attr("offset", "0%")
+		    .attr("stop-color", "#666");
+
+		radialGradient.append("stop")
+		    .attr("offset", "100%")
+		    .attr("stop-color", "#000");
+
+		var addons = [];
+
+		for(var i = 0; i < 10; i++){
+
+			var angle = Math.random()*Math.PI*2;
+			var x = (Math.cos(angle)*(150 + dim/2)) + (dim/2);
+			var y = (Math.sin(angle)*(150 + dim/2)) + (dim/2);
+
+			addons[i] = svg.append("circle")
+ 		 	 .attr("id", "small" + i)
+ 		   .attr("cx", x)
+ 		   .attr("cy", y)
+ 		   .attr("r",  smallr * (1.0 + i * 0.1))
+ 		 	.style("fill","#444");
+		}
+
+		//main circle
+		var main = svg.append("circle")
+			.attr("id", "big")
+			.attr("cx", dim/2)
+			.attr("cy", dim/2)
+			.attr("r", size)
+			.style("fill","url(#radial-gradient)");
+
+		var scale = 1.1;
+
+		//addons.forEach(function(addon){
+		for(var i = 0; i < 10; i++){
+			var id = "small" + i;
+			var dx = dim/2 - parseInt(document.getElementById(id).getAttribute("cx"));
+			var dy = dim/2 - parseInt(document.getElementById(id).getAttribute("cy"));
+			
+			addons[i].transition()
+				.delay(i * 500)
+				.duration(750)
+				.attr("transform", "translate(" + dx + "," + dy + ")");
+
+
+				//figure out scale
+			main.transition()
+				.delay((i * 500) + 200)
+				.duration(500)
+				//.each(slide);
+				.attr("transform", "translate(250, 250), scale(" + scale + "," + scale + "), translate(-250, -250)");
+
+			scale += 0.1;
+		}
+
+	</script>
+</body>
+</html>
+

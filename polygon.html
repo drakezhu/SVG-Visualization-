@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <script lang="javascript" src="js/jquery-3.1.0.min.js"></script>
+    <script lang="javascript" src="js/d3.min.js"></script>
+</head>
+<body>
+	
+        <script>
+		/*
+		 * Name: Maja Milosavljevic
+                 * CS Login: mmilos01
+		 * Word: Plunge
+                 * 
+                 * References: 
+                 *      http://bl.ocks.org/mbostock/3305854 for cycle animation function
+		 */
+                
+		var dimension = 500;
+                var d = dimension/3;
+		var svg = d3.select('body').append('svg')
+			.attr('width', dimension)
+			.attr('height', dimension)
+			.style('background-color', 'black');
+                svg.append("polygon")
+                        .attr("points", dimension/2 +","+ dimension/28 +"  "+ (dimension*(379/700)) + ","+ (dimension*(111/700)) + " "+ (dimension*(67/100)) + ","+ (dimension*(111/700)) + " "+ (dimension*(397/700)) + ","+ (dimension*(33/140)) + " "+ (dimension*(423/700)) + ","+ (dimension*(251/700)) + " "+ dimension/2 + ","+ (dimension*(2/7)) + " "+ (dimension*(277/700)) + ","+ (dimension*(251/700)) + " "+ (dimension*(303/700)) + ","+ (dimension*(33/140)) + " "+ (dimension*(231/700)) + ","+ (dimension*(111/700)) + " "+ (dimension*(321/700)) + ","+ (dimension*(111/700)))
+                        .attr("fill", "white")
+                        .attr("stroke", "midnightblue");
+                svg.append("polygon")
+                        .attr("points", (d+(dimension/2)) +","+ dimension/28 +"  "+ (d+(dimension*(379/700))) + ","+ (dimension*(111/700)) + " "+ (d+(dimension*(67/100))) + ","+ (dimension*(111/700)) + " "+ (d+(dimension*(397/700))) + ","+ (dimension*(33/140)) + " "+ (d+(dimension*(423/700))) + ","+ (dimension*(251/700)) + " "+ (d+(dimension/2)) + ","+ (dimension*(2/7)) + " "+ (d+(dimension*(277/700))) + ","+ (dimension*(251/700)) + " "+ (d+(dimension*(303/700))) + ","+ (dimension*(33/140)) + " "+ (d+(dimension*(231/700))) + ","+ (dimension*(111/700)) + " "+ (d+(dimension*(321/700))) + ","+ (dimension*(111/700)))
+                        .attr("fill", "white")
+                        .attr("stroke", "midnightblue");
+                svg.append("polygon")
+                        .attr("points", ((dimension/2)-d) +","+ dimension/28 +"  "+ ((dimension*(379/700))-d) + ","+ (dimension*(111/700)) + " "+ ((dimension*(67/100))-d) + ","+ (dimension*(111/700)) + " "+ ((dimension*(397/700))-d) + ","+ (dimension*(33/140)) + " "+ ((dimension*(423/700))-d) + ","+ (dimension*(251/700)) + " "+ ((dimension/2)-d) + ","+ (dimension*(2/7)) + " "+ ((dimension*(277/700))-d) + ","+ (dimension*(251/700)) + " "+ ((dimension*(303/700))-d) + ","+ (dimension*(33/140)) + " "+ ((dimension*(231/700))-d) + ","+ (dimension*(111/700)) + " "+ ((dimension*(321/700))-d) + ","+ (dimension*(111/700)))
+                        .attr("fill", "white")
+                        .attr("stroke", "midnightblue");
+                svg.append("rect")
+                        .attr("x", 0)
+                        .attr("y", (((dimension/2)+d)))
+                        .attr("width", dimension)
+                        .attr("height", dimension - ((dimension/2)+d))
+                        .attr("fill", "black");
+		svg.append("path")
+                        .attr("d", "M 0 " + ((dimension/2)+d) + "C "+ (dimension*(2/25)) +" " + ((dimension*(9/25))+d) + ", "+ (dimension*(13/100)) +" " + ((dimension*(9/25))+d) + ", "+ (dimension*(19/100)) +" " + ((dimension/2)+d) + "S "+ (dimension*(3/10)) +" "+ ((dimension*(16/25))+d) +", " + (dimension*(9/25)) + " " + ((dimension/2)+d))
+                        .attr("stroke", "white")
+                        .attr("fill", "midnightblue");
+                svg.append("path")
+                        .attr("d", "M "  + (dimension*(9/25)) + " " + ((dimension/2)+d) + "C "+ (dimension*(11/25)) +" " + ((dimension*(9/25))+d) +  ", "+ (dimension*(49/100)) +" " + ((dimension*(9/25))+d) +  ", "+ (dimension*(11/20)) +" " + ((dimension/2)+d) + "S "+ (dimension*(33/50)) +" "+ ((dimension*(16/25))+d) +", "+ (dimension*(18/25)) +" "+ ((dimension/2)+d))
+                        .attr("stroke", "white")
+                        .attr("fill", "midnightblue");
+                svg.append("path")
+                        .attr("d", "M "+ (dimension*(18/25)) +" " + ((dimension/2)+d) + "C "+ (dimension*(4/5)) +" " + ((dimension*(9/25))+d) +  ", "+ (dimension*(17/20)) +" " + ((dimension*(9/25))+d) + ", "+ (dimension*(91/100)) +" " + ((dimension/2)+d) + "S "+ (dimension*(51/50)) +" "+ ((dimension*(16/25))+d) +", "+ (dimension*(27/25)) +" " + ((dimension/2)+d))
+                        .attr("stroke", "white")
+                        .attr("fill", "midnightblue");
+                svg.append("g")
+                        .attr("transform", "translate(" + (dimension / 2) + "," + ((2*dimension )/ 3) + ")")
+                        .append("path")
+                        .attr("d", d3.svg.symbol().type("square").size(dimension*5))
+                        .attr("fill", "midnightblue")
+                        .attr("stroke", "white")
+                        .each(cycle);
+                svg.append("g")
+                        .attr("transform", "translate(" + (dimension / 4) + "," + ((2*dimension )/ 3) + ")")
+                        .append("path")
+                        .attr("d", d3.svg.symbol().type("square").size(dimension*5))
+                        .attr("fill", "midnightblue")
+                        .attr("stroke", "white")
+                        .each(cycle);
+                svg.append("g")
+                        .attr("transform", "translate(" + ((3*dimension) / 4) + "," + ((2*dimension )/ 3) + ")")
+                        .append("path")
+                        .attr("d", d3.svg.symbol().type("square").size(dimension*5))
+                        .attr("fill", "midnightblue")
+                        .attr("stroke", "white")
+                        .each(cycle);   
+               
+               
+                d3.selectAll("polygon")
+                        .on("click", function(){
+                            d3.select(this)
+                            .transition()
+                            .duration(2000)
+                            .attr("points", dimension/2 +","+ Math.pow(dimension,2)/28 +"  "+ (dimension*(379/700)) + ","+ (Math.pow(dimension,2)*(111/700)) + " "+ (dimension*(67/100)) + ","+ (Math.pow(dimension,2)*(111/700)) + " "+ (dimension*(397/700)) + ","+ (Math.pow(dimension,2)*(33/140)) + " "+ (dimension*(423/700)) + ","+ (Math.pow(dimension,2)*(251/700)) + " "+ dimension/2 + ","+ (Math.pow(dimension,2)*(2/7)) + " "+ (dimension*(277/700)) + ","+ (Math.pow(dimension,2)*(251/700)) + " "+ (dimension*(303/700)) + ","+ (Math.pow(dimension,2)*(33/140)) + " "+ (dimension*(231/700)) + ","+ (Math.pow(dimension,2)*(111/700)) + " "+ (dimension*(321/700)) + ","+ (Math.pow(dimension,2)*(111/700)))
+                        }); 
+             
+                function cycle() {
+                    d3.select(this).transition()
+                        .duration(10000)
+                        .attrTween("transform", function() { return d3.interpolateString("rotate(0)", "rotate(720)"); })
+                        .each("end", cycle);
+                }
+	</script>
+</body>
+</html>

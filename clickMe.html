@@ -3,66 +3,113 @@
 <head>
 	<script lang="javascript" src="js/jquery-3.1.0.min.js"></script>
 	<script lang="javascript" src="js/d3.min.js"></script>
+	<style>
+		html, body {
+			padding: 0;
+			margin: 0;
+		}
+	</style>
 </head>
-<body>	
+<body>
 	<script>
-		/*
-		 *     Name: Jade Chan
-		 * CS Login: jchan03
-		 *     Word: Reverberate
-		 */
-
 		var dimension = 500;
 
-		var svg = d3.select("body").append("svg")
-			.attr("width", dimension)
-			.attr("height", dimension)
-			.style("background-color", "white");
+		var svg = d3.select('body').append('svg')
+			.attr('width', dimension)
+			.attr('height', dimension)
+			.style('background-color', 'black')
+			;
 
-		/* MAKE THE MAGIC HAPPEN HERE */
+		// YOUR CODE SHOULD START HERE
+		/*
+		 * Name: YOUR NAME
+		 * Word: THE WORD YOU CHOSE
+		 */
+		var rope_x = dimension/2;
+		var rope_y = 0;
+		var rope_width = dimension/20;
+		var current_rope_color = "white";
+		var rope_set = [];
+		var set_size = 0;
+		var mousecoord = [0, 0];
 
-		var radius = 2;
-		var radius_scale = dimension / 30; /* Size varies with dimension of screen */
-		var numCircles = dimension / 25; /* Size varies with dimension of screen */
-		var draw_duration = 80;
-		var fade_duration = draw_duration / 4; /* Fades away 4 times as quickly as it is drawn */
-		var stroke_r = 0;
-		var stroke_g = 255;
-		var stroke_b = 255;
-		var stroke_width = 2;
+		var svg = d3.select('body').append('svg')
+			.attr('width', dimension)
+			.attr('height', dimension)
+            .on("mousemove", function () {
+                mousecoord = d3.mouse(this);                
+                d3.select("#light").attr("cx", mousecoord[0])
+                                   .attr("cy", mousecoord[1]);
+                var x_offset = (mousecoord[0] - dimension/2) / (dimension / 10);
+                var y_offset = (mousecoord[1] - dimension/2) / (dimension / 10);
+                d3.select("#eye").attr("transform", "translate(" + x_offset + ", " + y_offset +")");
+                d3.select("#eye").attr("clip-path", "url(#eye_clip)");
+            })
+			.style('background-color', 'black');             
 
-		var text = svg.append("text")
-			.text("Click me!")
-			.attr("x", dimension / 2)
-			.attr("y", dimension / 2)
-			.style("text-anchor", "middle");
-			
-		svg.on("click", function() {
-			svg.select("text").remove();
-			x_pos = event.pageX;
-			y_pos = event.pageY;
-			draw(x_pos, y_pos);
-		});
 
-		function draw(x_pos, y_pos) {
-			for (var i = 0 ; i <= numCircles; i++) {
-				svg.append("circle")
-					.attr("cx", x_pos)
-					.attr("cy", y_pos)
-					.attr("r", radius + (i * radius_scale))
-					.attr("fill", "none")
-					.style("stroke", "rgba(" + stroke_r + "," + stroke_g + "," + stroke_b + "," + (1 - (i / numCircles)) + ")")
-					.style("stroke-width", stroke_width)
-					.style("opacity", 0)
-					.transition()
-					.duration(i * draw_duration)
-					.style("opacity", 1)
-					.transition()
-					.duration(i * fade_duration)
-					.style("opacity", 0);
+		var origin_rope = svg.append("rect")
+				.attr("x", rope_x)
+				.attr("y", rope_y)
+				.attr("width", rope_width)
+				.attr("height", dimension)
+				.attr("fill", current_rope_color)
+				.on("click", sever);
+
+		rope_set[set_size] = origin_rope;
+		set_size = set_size + 1;
+
+		function sever() {
+			var m = d3.mouse(this);
+
+
+			var object_y = d3.select(this).attr("y");
+			var object_x = d3.select(this).attr("x");
+			var new_x = Math.random() * (dimension - rope_width);
+			var object_height = d3.select(this).node().getBoundingClientRect().height;
+
+
+			d3.select(this).attr("height", m[1] - object_y);
+
+			var new_height =  object_height - (m[1] - object_y);
+			var new_rope = svg.append("rect")
+					.attr("x", object_x)
+					.attr("y", m[1])
+					.attr("width", dimension/20)
+					.attr("height", new_height)
+					.attr("fill", "white")
+					.on("click", sever);
+
+			rope_set[set_size] = new_rope;
+			set_size = set_size + 1;
+
+			changecolor();
+
+			new_rope.transition().attr("x", new_x).duration(100);
+
+		}
+
+		function  changecolor() {
+			var new_background_color = "";
+			if(current_rope_color == "white")
+			{
+				current_rope_color = "black";
+				new_background_color = "white";
+			}
+			else
+			{
+				current_rope_color = "white";
+				new_background_color = "black";
+			}
+
+			svg.style('background-color', new_background_color);
+			for(i = 0; i < set_size; i++)
+			{
+				rope_set[i].attr("fill", current_rope_color);
 			}
 		}
 
+		// YOUR CODE SHOULD END HERE
 	</script>
 </body>
-</html>
+</html>l

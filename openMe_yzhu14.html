@@ -55,6 +55,8 @@
 		svg.on("click", function() {
 			circles.each(function(){
             var cur_thing = d3.select(this);
+            var cur_x = cur_thing.attr("cx");
+            var cur_y = cur_thing.attr("cy");
             cur_thing.attr("opacity",1)
         });
 			
@@ -82,6 +84,8 @@
 
         circles.each(function(){
             var cur_thing = d3.select(this);
+            var cur_x = cur_thing.attr("cx");
+            var cur_y = cur_thing.attr("cy");
             cur_thing.on("mouseover",conceal())
 
         });

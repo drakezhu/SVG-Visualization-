@@ -55,7 +55,7 @@
 		svg.append("circle")
             .attr("id", "light")
             .attr("pointer-events", "none")
-            .attr("r", 30)
+            .attr("r", 15)
             .attr("fill", "green")
             .attr("opacity", 0.5);
 
@@ -69,19 +69,20 @@
         var circles = svg.selectAll("circle")
             .data(dataset)
             .enter()
-            .append("circle")
-            .style('fill', "255,198,0");
+            .append("circle");
         
         circles.attr("cx", function(d) { return d[0]; })
            .attr("cy", function(d) { return d[1]; })
-           .attr("r", 5)
+           .attr("r", 8)
            .attr("fill","orange");
+           //.on("mouseover", callback());
 
         circles.each(function(){
             var cur_thing = d3.select(this);
             var cur_x = cur_thing.attr("cx");
             // var move_x = (x_dimension/2) - cur_x;
             var cur_y = cur_thing.attr("cy");
+            cur_thing.on("mouseover",callback())
             // var move_y = (y_dimension/2) - cur_y;
             // cur_thing.transition()
             //     .duration(Math.random() * 30000)
@@ -99,9 +100,16 @@
 		// 	y_pos = event.pageY;
 			
 		// });
+		function callback(){
+   			return function(){
+    			d3.select(this).attr("fill","black");
+    								
+    									
+    		}
+    	}
 
 
-		console.log(d3.select("#hi").attr("r"));
+		
 
 		// YOUR CODE SHOULD END HERE
 	</script>

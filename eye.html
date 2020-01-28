@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script lang="javascript" src="js/jquery-3.1.0.min.js"></script>
+	<script lang="javascript" src="js/d3.min.js"></script>
+</head>
+<body>
+	
+	<script>
+		/*
+		 * Name: Alena Borisenko (aboris01)
+		 * Word: Dilate
+		 */
+        
+		var dimension = 500;
+        var mousecoord = [0, 0];
+
+		var svg = d3.select('body').append('svg')
+			.attr('width', dimension)
+			.attr('height', dimension)
+            .on("mousemove", function () {
+                mousecoord = d3.mouse(this);                
+                d3.select("#light").attr("cx", mousecoord[0])
+                                   .attr("cy", mousecoord[1]);
+                var x_offset = (mousecoord[0] - dimension/2) / (dimension / 10);
+                var y_offset = (mousecoord[1] - dimension/2) / (dimension / 10);
+                d3.select("#eye").attr("transform", "translate(" + x_offset + ", " + y_offset +")");
+                d3.select("#eye").attr("clip-path", "url(#eye_clip)");
+            })
+			.style('background-color', 'black');             
+
+        // group for the eyeball outline
+        eyeball = svg.append("g")
+                 .attr("id", "eyeball");                        
+        eyeball.append("path")
+            .attr("id", "eyeballTop")
+            .attr("d", "M131,250 C174,132 356,189 363,250")
+            .attr("stroke", "white");
+        eyeball.append("path")
+            .attr("id", "eyeballBot")
+            .attr("d", "M131,250 C195,381 350,306 363,250")
+            .attr("stroke", "white");
+
+        // eyecolor gradient
+        var radialGradient = svg.append("defs")
+            .append("radialGradient")
+            .attr("id", "eyecolor");
+        radialGradient.append("stop")
+                      .attr("offset", "30%")
+                      .attr("stop-color", "#003300");    // inner color
+        radialGradient.append("stop")
+                      .attr("offset", "100%")
+                      .attr("stop-color", "#008000");    // outer color
+
+
+        svg.append("clipPath")
+            .attr("id", "eye_clip")
+            .append("path")
+            .attr("d", "M131,250 C174,132 356,189 363,250 M131,250 C195,381 350,306 363,250 z");
+
+        // group for the moving part of the eye
+        eye = svg.append("g")
+                 .attr("id", "eye")
+                 .attr("clip-path", "url(#eye_clip)");
+        // eye iris
+        eye.append("circle")
+            .attr("id", "iris")
+            .attr("pointer-events", "all")
+            .attr("cx", 250)
+            .attr("cy", 250)
+            .attr("r", 60)
+            .attr("fill", "url(#eyecolor)")
+            .on("mouseover", function () {
+                d3.select("#pupil").transition()
+                                   .duration(1000)
+                                   .attr("r", 20);
+            })
+            .on("mouseout", function () {
+                d3.select("#pupil").transition()
+                                   .duration(1000)
+                                   .attr("r", 40);
+            });
+        // eye pupil
+        eye.append("circle")
+            .attr("id", "pupil")
+            .attr("pointer-events", "none")
+            .attr("cx", 250)
+            .attr("cy", 250)
+            .attr("r", 40)
+            .attr("fill", "black");
+
+        // eyebrow
+        svg.append("path")
+            .attr("d", "M109,163 C166,98 212,152 382,180") 
+            .attr("stroke", "#331a00")
+            .attr("stroke-width", 15)
+            .attr("stroke-linecap", "round");   
+
+        // light source that follows the cursor
+        svg.append("circle")
+            .attr("id", "light")
+            .attr("pointer-events", "none")
+            .attr("r", 30)
+            .attr("fill", "yellow")
+            .attr("opacity", 0.5);
+
+	</script>
+</body>
+</html>

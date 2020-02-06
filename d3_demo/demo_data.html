@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Data Visualization</title>
+    <script src="d3.min.js"></script>
+    <style>
+        
+        div.tooltip {	
+            position: absolute;			
+            text-align: center;			
+            width: 60px;					
+            height: 28px;					
+            padding: 2px;				
+            font: 12px sans-serif;
+            color: white;			
+            background: black;	
+            border: 0px;		
+            border-radius: 8px;			
+            pointer-events: none;			
+        }
+
+    </style>
+  </head>
+  <body>
+    <h1>Data Visualization</h1>
+    <p>Ma Stocks</p>
+
+    <svg class="chart"></svg>
+    
+    <script src="demo_data.js"></script>
+    <script>
+    
+    var div = d3.select("body").append("div")	
+        .attr("class", "tooltip")				
+        .style("opacity", 0);
+
+    var margin = {top: 10, right: 10, bottom: 30, left: 40},
+         width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+        
+    var color = d3.scaleOrdinal().range(d3.schemeCategory20);
+        
+    var barWidth = width / data.length;
+
+    var y = d3.scaleLinear()
+        .domain([0, d3.max(data, function(d) { return d.price; })])
+        .range([height, 0]);
+        
+    var x = d3.scaleBand()
+        .domain(data.map(function(d) { return d.symbol; }))
+        .range([0, width]);
+
+    var chart = d3.select(".chart")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var bar = chart.selectAll("g")
+        .data(data)
+      .enter().append("g")
+        .attr("transform", function(d, i) { return "translate(" + i * barWidth + ", 0)"; });
+        
+    chart.append("g")
+        .call(d3.axisLeft(y));
+        
+    chart.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x));
+
+    bar.append("rect")
+        .attr("y", function(d) { return y(d.price); })
+        .attr("height", function(d) { return height - y(d.price); })
+        .attr("width", barWidth - 1)
+        .style("fill", function(d, i) { return color(i); })
+        .on("mouseover", function(d) {		
+            div.transition()		
+                .duration(200)		
+                .style("opacity", .9);		
+            div.html(d.name)	
+                .style("left", (d3.event.pageX) + "px")		
+                .style("top", (d3.event.pageY - 28) + "px");	
+            })					
+        .on("mouseout", function(d) {		
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
+        
+
+    </script>
+    
+  </body>
+</html>

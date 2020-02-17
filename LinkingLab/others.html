@@ -7,14 +7,47 @@
 	<link rel="stylesheet" href="css/hierarchy.css">
 </head>
 <body>
-<div id="hierarchy1"></div>
-<div id="hierarchy2"></div>
-	<script src="d3.v4.min.js"></script>
+	<div id="hierarchy1">
+	</div>
+	<div id="hierarchy2">
+	</div>
+	<style>
+		.node circle {
+			fill: #999;
+		}
+
+		.node text {
+			font: 10px sans-serif;
+		}
+
+		.node--internal circle {
+			fill: #555;
+		}
+
+		.node--internal text {
+			text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+		}
+
+		.link {
+			fill: none;
+			stroke: #555;
+			stroke-opacity: 0.4;
+			stroke-width: 1.5px;
+		}
+	</style>
 	<script>
+		/*
+		 * Name: Sejal Dua
+		 * Treemap
+		 * Nodelink
+		 */
+
+		/* TREEMAP */
 
 		var width = $('#hierarchy1').width();
 		var height = $('#hierarchy1').height();
 		var margin = 20;
+
 		var svg = d3.select("#hierarchy1").append("svg")
 			.attr("width", width - margin)
 			.attr("height", height - margin)
@@ -32,16 +65,14 @@
 			.paddingInner(1);
 
 		var root = d3.hierarchy(flare)
-			.eachBefore(function(d) {  d.data.id = (d.parent ? d.parent.data.id + "." : "") + d.data.name;} )
+			.eachBefore(function(d) { d.data.id = (d.parent ? d.parent.data.id + "." : "") + d.data.name; })
 			.sum(sumBySize)
 			.sort(function(a, b) { return b.height - a.height || b.value - a.value; });
 
-		treemap(root);
-		
 
-//		root.each(function (d) {
-//			console.log(d.data.id);
-//		})
+		console.log(root);
+		treemap(root);
+
 		var cell = svg.selectAll("g")
 			.data(root.leaves())
 			.enter().append("g")
@@ -65,8 +96,8 @@
 			.enter().append("tspan")
 			.attr("x", 4)
 			.attr("y", function(d, i) { return 13 + i * 10; })
-			.text(function(d) { return d; })
-		
+			.text(function(d) { return d; });
+
 		cell.append("title")
 			.text(function(d) { return d.data.id + "\n" + format(d.value); });
 
@@ -80,12 +111,66 @@
 		function sumBySize(d) {
 			return d.size;
 		}
+
+		// /* SUNBURST */
+		// var width = $('#hierarchy2').width(),
+		// 	height = $('#hierarchy2').height(),
+		// 	radius = (Math.min(width, height) / 2) - 10;
+
+		// var formatNumber = d3.format(",d");
+
+		// var x = d3.scaleLinear()
+		// 	.range([0, 2 * Math.PI]);
+
+		// var y = d3.scaleSqrt()
+		// 	.range([0, radius]);
+
+		// var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+		// var partition = d3.partition();
+
+		// var arc = d3.arc()
+		// 	.startAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x0))); })
+		// 	.endAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x1))); })
+		// 	.innerRadius(function(d) { return Math.max(0, y(d.y0)); })
+		// 	.outerRadius(function(d) { return Math.max(0, y(d.y1)); });
+
+
+		// var svg = d3.select("#hierarchy2").append("svg")
+		// 	.attr("width", width - margin)
+		// 	.attr("height", height - margin)
+		// 	.append("g")
+		// 	.attr("transform", "translate(" + ((width / 2) + (margin / 2)) + "," + ((height / 2) + (margin / 2)) + ")");
 		
-		
-		/*
-		Node link part
-		*/
-		
+		// var root = d3.hierarchy(flare);
+		// root.sum(function(d) { return d.size; });
+
+		// svg.selectAll("path")
+		// 	.data(partition(root).descendants())
+		// 	.enter().append("path")
+		// 	.attr("d", arc)
+		// 	.attr("display", function(d) { return d.depth ? null : "none"; })
+		// 	.style("fill", function(d) { return color((d.children ? d : d.parent).data.name); });
+
+		// svg.selectAll("text")
+		// 	.data(partition(root).descendants().filter(function(d) { return x(d.x1)-x(d.x0) > .05; }))
+		// 	.enter().append("text")
+		// 	.attr("transform", function(d) { 
+		// 		var rotation
+		// 		if(d.parent){
+		// 			offset =  d.x1 + .005 > 1 ? d.x1 + .005 - 1 : d.x1 + .005;
+		// 			rotation = (Math.max(0, Math.min(2 * Math.PI, x(offset)))  - Math.PI / 2) / Math.PI * 180;
+		// 		}else rotation = 0;
+		// 		return "rotate(" + rotation + ")"; })
+		// 	.attr("x", function(d) { return Math.max(0, y(d.y0)); })
+		// 	.attr("dx", "6") // margin
+		// 	.attr("dy", ".35em") // vertical-align
+		// 	.text(function(d) { return d.data.name; });
+
+		// d3.select(self.frameElement).style("height", height + "px");
+
+
+		/* NODELINK */
 		var width = $('#hierarchy2').width();
 		var height = $('#hierarchy2').height();
 
@@ -132,6 +217,5 @@
 		}
 
 	</script>
-
 </body>
 </html>

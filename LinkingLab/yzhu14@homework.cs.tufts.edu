@@ -34,16 +34,12 @@
 	}
 	</style>
 	<script>
-                /*
-                * Name: Yunke Zhu
-                * Treemap
-                * Nodelink
-                *
-                *
-                * Functionality:
-                *       1. When you move your mouse to either structure, the correspoding part of another structure will give you a reflection by changing the color.
-                *       2. When you click on the mouse to either text, the relevent data(for this case, the data is the size) will be shown on the screen, and meanwhile there is a prompt to let you know the corresponding part.
-                */
+		/*
+	 	* Name: Yunke Zhu
+	 	* Treemap
+	 	* Nodelink
+	 	*/
+
 
 		// Treemap
 		var width = $('#hierarchy1').width();

@@ -10,6 +10,29 @@
 <div id="hierarchy1"></div>
 <div id="hierarchy2"></div>
 	<script src="d3.v4.min.js"></script>
+	<style>.node circle {
+		fill: #999;
+	}
+
+	.node text {
+		font: 10px sans-serif;
+	}
+
+	.node--internal circle {
+		fill: #555;
+	}
+
+	.node--internal text {
+		text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
+	}
+
+	.link {
+		fill: none;
+		stroke: #555;
+		stroke-opacity: 0.4;
+		stroke-width: 1.5px;
+	}
+	</style>
 	<script>
 
 		var width = $('#hierarchy1').width();
@@ -45,13 +68,22 @@
 		var cell = svg.selectAll("g")
 			.data(root.leaves())
 			.enter().append("g")
-			.attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; });
+			.attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; })
+			.attr("id", function(d) { return d.data.name; });
 
 		cell.append("rect")
 			.attr("id", function(d) { return d.data.id; })
 			.attr("width", function(d) { return d.x1 - d.x0; })
 			.attr("height", function(d) { return d.y1 - d.y0; })
 			.attr("fill", function(d) { return color(d.parent.data.id); });
+
+			const isEmpty = svg.selectAll("g").each(function (d) {
+				
+				var tmp = d3.select(this).select("rect");
+		//		console.log(tmp);	
+			})
+			
+		
 
 		cell.append("clipPath")
 			.attr("id", function(d) { return "clip-" + d.data.id; })
@@ -99,7 +131,7 @@
 			.size([2 * Math.PI, 250])
 			.separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
 
-		var root = d3.hierarchy(flare);
+		//var root = d3.hierarchy(flare);
 
 		tree(root);
 
@@ -115,7 +147,10 @@
 			.data(root.descendants())
 			.enter().append("g")
 			.attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
-			.attr("transform", function(d) { return "translate(" + radialPoint(d.x, d.y) + ")"; });
+			.attr("transform", function(d) { return "translate(" + radialPoint(d.x, d.y) + ")"; })
+			.attr("id", function (d) {
+				return  d.data.name
+			});
 
 		node.append("circle")
 			.attr("r", 2.5);
@@ -125,11 +160,83 @@
 			.attr("x", function(d) { return d.x < Math.PI === !d.children ? 6 : -6; })
 			.attr("text-anchor", function(d) { return d.x < Math.PI === !d.children ? "start" : "end"; })
 			.attr("transform", function(d) { return "rotate(" + (d.x < Math.PI ? d.x - Math.PI / 2 : d.x + Math.PI / 2) * 180 / Math.PI + ")"; })
-			.text(function(d) { return d.data.name });
+			.text(function(d) { return d.data.name })
+			.attr("id", function (d) {
+				return d.data.name
+			});
 
 		function radialPoint(x, y) {
 		return [(y = +y) * Math.cos(x -= Math.PI / 2), y * Math.sin(x)];
 		}
+		
+				
+		cell.selectAll("rect").on("mouseover", function (d) {
+			d3.select(this)
+			  .transition()
+			  .delay(100)
+			  .style("fill","red")
+			  .transition()
+			  .delay(200)
+			  .style("fill", function(d) { return color(d.parent.data.id); });
+			
+			
+			node.select("#" + d.data.name)
+			  .transition()
+			  .delay(100)
+			  .style("fill", "red")
+			  .transition()
+			  .delay(200)
+			  .style("fill", function(d) { return color(d.parent.data.id); });
+			
+		})
+		
+		
+		node.selectAll("text").on("mouseover", function (d) {
+			d3.select(this)
+			  .transition()
+			  .delay(100)
+			  .style("fill","red")
+			  .transition()
+			  .delay(200)
+			  .style("fill", function(d) { return color(d.parent.data.id); });
+			
+			var x = cell.select("rect").each(function (t) {
+				if (t.data.name == d.data.name)
+				{
+					console.log("hello");
+					d3.select(this)
+					.transition()
+					.delay(100)
+					.style("fill", "red")
+					.transition()
+					.delay(200)
+					.style("fill", function(d) { return color(d.parent.data.id); });
+				}
+//				console.log(t.data.name);
+//				console.log(d.data.name);
+				
+			})
+			var y = cell.select("#NodeLinkTreeLayout").empty();
+			
+			
+			//console.log(cell);
+			//console.log(x);
+			
+			
+			
+			
+			cell.select("#" + d.data.name)
+			  .transition()
+			  .delay(100)
+			  .style("fill", "red")
+			  .transition()
+			  .delay(200)
+			  .style("fill", function(d) { return color(d.parent.data.id); });
+
+			
+		})
+		
+		
 
 	</script>
 

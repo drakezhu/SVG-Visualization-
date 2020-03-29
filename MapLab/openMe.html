@@ -18,15 +18,15 @@ h1 {
   stroke-linejoin: round;
 }
 
-.q0-9 { fill:rgb(247,251,255); }
-.q1-9 { fill:rgb(222,235,247); }
-.q2-9 { fill:rgb(198,219,239); }
-.q3-9 { fill:rgb(158,202,225); }
-.q4-9 { fill:rgb(107,174,214); }
-.q5-9 { fill:rgb(66,146,198); }
-.q6-9 { fill:rgb(33,113,181); }
-.q7-9 { fill:rgb(8,81,156); }
-.q8-9 { fill:rgb(8,48,107); }
+.q0-9 { fill:#ffffe0; }
+.q1-9 { fill:#ffe6b1; }
+.q2-9 { fill:#ffcc85; }
+.q3-9 { fill:#ffa500; }
+.q4-9 { fill:#fc7b00; }
+.q5-9 { fill:#e04200; }
+.q6-9 { fill:#d23001; }
+.q7-9 { fill:#b11102; }
+.q8-9 { fill:#8b0000; }
 
 </style>
 <h1></h1></br>
@@ -45,7 +45,7 @@ var svg = d3.select("svg"),
 var rateById = d3.map();
 
 var quantize = d3.scaleQuantize()
-    .domain([0, 0.15])
+    .domain([0, 90])
     .range(d3.range(9).map(function(i) { return "q" + i + "-9"; }));
 
 var projection = d3.geoAlbersUsa()
@@ -57,7 +57,30 @@ var path = d3.geoPath()
 
 d3.queue()
     .defer(d3.json, "js/us.json")
-    .defer(d3.tsv, "tsv/unemployment.tsv", function(d) { rateById.set(d.id, +d.rate); })
+    .defer(d3.tsv, "tsv/drought.tsv", function(d) { 
+      if (d.D4 > 0) {
+        rateById.set(d.FIPS, 89); 
+      }
+      else if (d.D3 > 0 ) {
+         rateById.set(d.FIPS, 74);
+      }
+      else if (d.D2 > 0) {
+        rateById.set(d.FIPS, 59);
+      } 
+      else if (d.D1 > 0) {
+        rateById.set(d.FIPS, 44);
+      }
+      else if (d.D0 > 0) {
+        rateById.set(d.FIPS, 29);
+      }
+      else if (d.Nothing > 0) {
+        rateById.set(d.FIPS, 14);
+      }
+      else {
+        rateById.set(d.FIPS, 1);
+      }
+    })
+    
     .await(ready);
 
 function ready(error, us) {
